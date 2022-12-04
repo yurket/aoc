@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func decodeLetters(s string) string {
+func decodeLettersPart1(s string) string {
 	table := map[string]string{
 		"A": "R",
 		"X": "R",
@@ -23,7 +23,7 @@ func decodeLetters(s string) string {
 	return s
 }
 
-func readRpsRounds(filename string) [][]string {
+func ReadAndDecodeRpsRounds(filename string, decoderFunc func(string) string) [][]string {
 	f, err := os.Open(filename)
 	if err != nil {
 		panic(fmt.Sprintf("Can't find file \"%s\"", filename))
@@ -35,7 +35,7 @@ func readRpsRounds(filename string) [][]string {
 	var rounds [][]string
 	for scanner.Scan() {
 		text := scanner.Text()
-		text = decodeLetters(text)
+		text = decoderFunc(text)
 		rounds = append(rounds, strings.Split(text, " "))
 	}
 
@@ -66,20 +66,19 @@ func rpsRoundScore(round []string) int {
 	return score
 }
 
-func rpsScore(filename string) (int, int) {
-	rounds := readRpsRounds(filename)
+func rpsScore(filename string) int {
+	rounds := ReadAndDecodeRpsRounds(filename, decodeLettersPart1)
 
-	var totalScore int
+	var scorePart1 int
 	for _, round := range rounds {
-		totalScore += rpsRoundScore(round)
+		scorePart1 += rpsRoundScore(round)
 	}
+	fmt.Printf("[Part1] Total score: %d\n", scorePart1)
 
-	fmt.Printf("[Part1] Total score: %d\n", totalScore)
-	// fmt.Printf("[Part2] \n")
-
-	return totalScore, 0
+	return scorePart1
 }
 
 func main() {
 	rpsScore("input")
+	rpsScorePart2("input")
 }

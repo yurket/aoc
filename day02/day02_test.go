@@ -7,13 +7,13 @@ import (
 )
 
 func TestPart1(t *testing.T) {
-	totalScore, _ := rpsScore("my_test_input")
+	totalScore := rpsScore("my_test_input")
 
 	require.Equal(t, 15, totalScore)
 }
 
-func TestReadingRpsRounds(t *testing.T) {
-	lines := readRpsRounds("my_test_input")
+func TestReadingAndDecodingRpsRounds(t *testing.T) {
+	lines := ReadAndDecodeRpsRounds("my_test_input", decodeLettersPart1)
 
 	require.Equal(t, 3, len(lines))
 	require.Equal(t, []string{"R", "P"}, lines[0])
