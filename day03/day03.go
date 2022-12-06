@@ -62,4 +62,5 @@ func countPriorities(filename string) int {
 
 func main() {
 	countPriorities("input")
+	countPrioritiesPart2("input")
 }
