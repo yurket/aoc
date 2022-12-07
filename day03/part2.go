@@ -2,7 +2,6 @@ package main
 
 import "fmt"
 
-// TODO: set type with intersect method
 func getSymbolInAllRucksacks(rucksacks []string) rune {
 	if len(rucksacks)%3 != 0 {
 		panic(fmt.Sprintf("Wrong number of rucksacks: %d", len(rucksacks)))
