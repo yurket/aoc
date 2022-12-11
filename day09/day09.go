@@ -77,50 +77,29 @@ func (r *Point) Add(p Point) {
 	r.y += p.y
 }
 
-func executeMoves(field *Field, moves []string) {
-	mid := int(len(field[0]) / 2)
-	head, tail := Point{mid, mid}, Point{mid, mid}
-	for _, move := range moves {
-		direction, steps := parseMove(move)
-		// fmt.Printf("Head %#v, Tail %#v.   Will move %s. \n", head, tail, move)
-		for i := steps; i > 0; i-- {
-			head.Add(direction)
-			tail.Follow(head)
-			field[tail.x][tail.y] = true
-		}
-	}
-}
+type Snake []Point
 
-type Snake [10]Point
-
-func newSnake(p Point) Snake {
-	s := Snake{}
+func newSnake(size int, p Point) Snake {
+	s := make([]Point, size)
 	for i := 0; i < len(s); i++ {
 		s[i] = p
 	}
 	return s
 }
-func (s *Snake) tail() Point {
+func (s Snake) tail() Point {
 	return s[len(s)-1]
 }
 
-func (s *Snake) moveAndUpdateField(move string, field *Field) {
-	direction, steps := parseMove(move)
-	for i := steps; i > 0; i-- {
-		s[0].Add(direction)
-		for j := 1; j < len(s); j++ {
-			s[j].Follow(s[j-1])
-		}
-		field[s.tail().x][s.tail().y] = true
-	}
-}
-
-func executeSnakeMoves(field *Field, moves []string) {
-	mid := int(len(field[0]) / 2)
-	snake := newSnake(Point{mid, mid})
-
+func (s Snake) executeSnakeMoves(field *Field, moves []string) {
 	for _, move := range moves {
-		snake.moveAndUpdateField(move, field)
+		direction, steps := parseMove(move)
+		for i := steps; i > 0; i-- {
+			s[0].Add(direction)
+			for j := 1; j < len(s); j++ {
+				s[j].Follow(s[j-1])
+			}
+			field[s.tail().x][s.tail().y] = true
+		}
 	}
 }
 
@@ -139,13 +118,16 @@ func countVisited(field Field) int {
 func solve(filename string) (int, int) {
 	moves := readLines(filename)
 	field := Field{}
-	executeMoves(&field, moves)
+	mid := int(len(field[0]) / 2)
+	snake := newSnake(2, Point{mid, mid})
+	snake.executeSnakeMoves(&field, moves)
 	visited := countVisited(field)
-
 	fmt.Printf("[Part 1] visited: %#v\n", visited)
 
 	field = Field{}
-	executeSnakeMoves(&field, moves)
+
+	snake = newSnake(10, Point{mid, mid})
+	snake.executeSnakeMoves(&field, moves)
 	snakeVisited := countVisited(field)
 	fmt.Printf("[Part 2] visited snake: %d\n", snakeVisited)
 
