@@ -44,8 +44,14 @@ func TestRopeFollowMovingDiagonally(t *testing.T) {
 
 }
 
-// func TestPart2(t *testing.T) {
-// 	_, scenicScore := solve("my_test_input")
+func TestPart2(t *testing.T) {
+	_, snakeVisited := solve("my_test_input")
 
-// 	require.Equal(t, 8, scenicScore)
-// }
+	require.Equal(t, 1, snakeVisited)
+}
+
+func TestPart22(t *testing.T) {
+	_, snakeVisited := solve("my_test_input2")
+
+	require.Equal(t, 36, snakeVisited)
+}

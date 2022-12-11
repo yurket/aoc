@@ -91,6 +91,39 @@ func executeMoves(field *Field, moves []string) {
 	}
 }
 
+type Snake [10]Point
+
+func newSnake(p Point) Snake {
+	s := Snake{}
+	for i := 0; i < len(s); i++ {
+		s[i] = p
+	}
+	return s
+}
+func (s *Snake) tail() Point {
+	return s[len(s)-1]
+}
+
+func (s *Snake) moveAndUpdateField(move string, field *Field) {
+	direction, steps := parseMove(move)
+	for i := steps; i > 0; i-- {
+		s[0].Add(direction)
+		for j := 1; j < len(s); j++ {
+			s[j].Follow(s[j-1])
+		}
+		field[s.tail().x][s.tail().y] = true
+	}
+}
+
+func executeSnakeMoves(field *Field, moves []string) {
+	mid := int(len(field[0]) / 2)
+	snake := newSnake(Point{mid, mid})
+
+	for _, move := range moves {
+		snake.moveAndUpdateField(move, field)
+	}
+}
+
 func countVisited(field Field) int {
 	visited := 0
 	for _, row := range field {
@@ -111,9 +144,12 @@ func solve(filename string) (int, int) {
 
 	fmt.Printf("[Part 1] visited: %#v\n", visited)
 
-	// fmt.Printf("[Part 2] scenic Score: %d\n", scenicScore)
+	field = Field{}
+	executeSnakeMoves(&field, moves)
+	snakeVisited := countVisited(field)
+	fmt.Printf("[Part 2] visited snake: %d\n", snakeVisited)
 
-	return visited, 0
+	return visited, snakeVisited
 }
 
 func main() {
