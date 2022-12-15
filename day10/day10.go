@@ -55,7 +55,7 @@ func readInstructions(filename string) []Instruction {
 }
 
 type State struct {
-	cycle, signal int
+	cycle, X int
 }
 
 func simulateExecution(instructions []Instruction) []State {
@@ -81,19 +81,41 @@ func signalStrengthSum(states []State) int {
 	signalSum := 0
 	cycles := []int{20, 60, 100, 140, 180, 220}
 	for _, cycle := range cycles {
-		signalSum += states[cycle-1].signal * cycle
+		signalSum += states[cycle-1].X * cycle
 	}
 	return signalSum
 }
 
-func solve(filename string) (int, int) {
+func renderCrtScreen(states []State) string {
+	crtScreen := ""
+	crtRow := ""
+	for _, state := range states {
+		spriteStart, spriteEnd := (state.X%40)-1, (state.X%40)+1
+		crtPos := ((state.cycle - 1) % 40)
+		if crtPos >= spriteStart && crtPos <= spriteEnd {
+			crtRow += "#"
+		} else {
+			crtRow += "."
+		}
+
+		if len(crtRow) != 0 && (len(crtRow)%40) == 0 {
+			crtScreen += crtRow + "\n"
+			crtRow = ""
+		}
+	}
+
+	return crtScreen
+}
+
+func solve(filename string) (int, string) {
 	states := simulateExecution(readInstructions(filename))
 	signalsSum := signalStrengthSum(states)
 	fmt.Printf("[Part 1] Signal strengths sum: %#v\n", signalsSum)
 
-	// fmt.Printf("[Part 2] visited snake: %d\n", snakeVisited)
+	crtScreen := renderCrtScreen(states)
+	fmt.Printf("[Part 2] screen:\n%s\n", crtScreen)
 
-	return signalsSum, 0
+	return signalsSum, crtScreen
 }
 
 func main() {

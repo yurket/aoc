@@ -22,8 +22,16 @@ func TestExecutionStatesCorrectness(t *testing.T) {
 	require.Equal(t, State{5, 4}, states[4])
 }
 
-// func TestPart2(t *testing.T) {
-// 	_, snakeVisited := solve("my_test_input")
+func TestPart2CrtDrawing(t *testing.T) {
+	states := simulateExecution(readInstructions("my_test_input2"))
+	picture := renderCrtScreen(states)
 
-// 	require.Equal(t, 1, snakeVisited)
-// }
+	expected := `##..##..##..##..##..##..##..##..##..##..
+###...###...###...###...###...###...###.
+####....####....####....####....####....
+#####.....#####.....#####.....#####.....
+######......######......######......####
+#######.......#######.......#######.....
+`
+	require.Equal(t, expected, picture)
+}
