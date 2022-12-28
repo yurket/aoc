@@ -112,10 +112,19 @@ func parseMonkeys(lines []string) []Monkey {
 
 type Inspections []int
 
+func commonModulo(monkeys []Monkey) int {
+	mod := 1
+	for _, m := range monkeys {
+		mod *= m.divideBy
+	}
+	return mod
+}
+
 func countInspections(monkeys []Monkey, divider int, rounds int) Inspections {
+	commonMod := commonModulo(monkeys)
 	inspections := make(Inspections, len(monkeys))
 	for r := 1; r < rounds+1; r++ {
-		fmt.Printf("ROUND %d\n", r)
+		// fmt.Printf("ROUND %d\n", r)
 		for i := range monkeys {
 			// fmt.Printf("Monkey %d:\n", monkeys[i].id)
 			for _, item := range monkeys[i].startingItems {
@@ -126,6 +135,9 @@ func countInspections(monkeys []Monkey, divider int, rounds int) Inspections {
 				worryLevel = int(math.Floor(float64(worryLevel) / float64(divider)))
 				// fmt.Printf("\tWorry level becomes %d\n", worryLevel)
 
+				if divider == 1 {
+					worryLevel %= commonMod
+				}
 				passIndex := monkeys[i].passIfFalse
 				if worryLevel%monkeys[i].divideBy == 0 {
 					passIndex = monkeys[i].passIfTrue
@@ -133,13 +145,13 @@ func countInspections(monkeys []Monkey, divider int, rounds int) Inspections {
 				monkeys[passIndex].startingItems = append(monkeys[passIndex].startingItems, worryLevel)
 			}
 			monkeys[i].startingItems = []int{}
-			fmt.Println()
+			// fmt.Println()
 		}
-		fmt.Println()
-		for _, m := range monkeys {
-			fmt.Printf("Monkey %d: %v\n", m.id, m.startingItems)
-		}
-		fmt.Println()
+		// fmt.Println()
+		// for _, m := range monkeys {
+		// 	fmt.Printf("Monkey %d: %v\n", m.id, m.startingItems)
+		// }
+		// fmt.Println()
 	}
 
 	fmt.Printf("Inspections: %v\n", inspections)
@@ -166,12 +178,12 @@ func solve(filename string) (int, int) {
 	mb1 := monkeyBusiness(inspections)
 	fmt.Printf("[Part 1] Monkey business: %#v\n", mb1)
 
-	// monkeys = parseMonkeys(lines)
-	// inspections = countInspections(monkeys, Part2Divider, 20)
-	// mb2 := monkeyBusiness(inspections)
-	// fmt.Printf("[Part 2] MB:%v\n", mb2)
+	monkeys = parseMonkeys(lines)
+	inspections = countInspections(monkeys, Part2Divider, 10000)
+	mb2 := monkeyBusiness(inspections)
+	fmt.Printf("[Part 2] MonkeyBusiness2: %v\n", mb2)
 
-	return mb1, 0
+	return mb1, mb2
 }
 
 func main() {

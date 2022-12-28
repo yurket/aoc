@@ -27,8 +27,8 @@ func TestMonkeyParsing(t *testing.T) {
 	require.Equal(t, m2.passIfFalse, 3)
 }
 
-// func TestPart2(t *testing.T) {
-// 	_, monkeyBusiness := solve("my_test_input")
+func TestPart2(t *testing.T) {
+	_, monkeyBusiness := solve("my_test_input")
 
-// 	require.Equal(t, 2713310158, monkeyBusiness)
-// }
+	require.Equal(t, 2713310158, monkeyBusiness)
+}
