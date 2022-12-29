@@ -14,6 +14,7 @@ type Point struct {
 
 var NonePoint Point = Point{-1, -1, '-'}
 
+type Path []Point
 type Field [][]Point
 
 func parseField(filename string) (Point, Point, Field) {
@@ -71,9 +72,13 @@ func reachableNeighbours(p Point, f Field) []Point {
 	return ns
 }
 
-func recreatePath(cameFrom map[Point]Point, end Point) []Point {
-	path := []Point{end}
+func recreatePath(cameFrom map[Point]Point, end Point) Path {
+	path := Path{end}
 	p := end
+
+	if _, exists := cameFrom[p]; !exists {
+		return Path{}
+	}
 
 	for cameFrom[p] != NonePoint {
 		p = cameFrom[p]
@@ -86,7 +91,7 @@ func recreatePath(cameFrom map[Point]Point, end Point) []Point {
 	return path
 }
 
-func printPath(path []Point) {
+func printPath(path Path) {
 	fmt.Printf("Path lenght is %d, path: \n", len(path))
 	for _, p := range path {
 		fmt.Printf("[%d, %d, %s], ", p.row, p.col, string(p.val))
@@ -94,39 +99,68 @@ func printPath(path []Point) {
 	fmt.Println()
 }
 
-func BFS(start Point, end Point, field Field) []Point {
+func BFS(start Point, end Point, field Field) (Path, bool) {
 	frontier := Queue{}
 	frontier.Push(start)
 	cameFrom := map[Point]Point{}
 	cameFrom[start] = NonePoint
+	pathFound := false
 	for len(frontier) != 0 {
 		current := frontier.Pop()
 
 		if current == end {
+			pathFound = true
 			break
 		}
 
 		for _, n := range reachableNeighbours(current, field) {
-			// fmt.Printf("Trying point %v\n", n)
 			if _, exists := cameFrom[n]; !exists {
 				frontier.Push(n)
 				cameFrom[n] = current
 			}
 		}
 	}
+	path := Path{}
+	if pathFound {
+		path = recreatePath(cameFrom, end)
+	}
+	return path, pathFound
+}
 
-	path := recreatePath(cameFrom, end)
-	printPath(path)
-	return path
+func shortestPathFromAllLowElevations(start, end Point, field Field) Path {
+	shortestPath := make([]Point, 10000)
+	for _, row := range field {
+		for _, p := range row {
+			if p.val == 'a' {
+				path, found := BFS(p, end, field)
+				if !found {
+					continue
+				}
+				if len(path) < len(shortestPath) {
+					shortestPath = path
+				}
+			}
+		}
+	}
+	return shortestPath
 }
 
 func solve(filename string) (int, int) {
-	shortestPath := BFS(parseField("input"))
-	fmt.Printf("[Part 1] Shortest path length: %#v\n", len(shortestPath)-1)
+	s, e, f := parseField(filename)
+	shortestPath, found := BFS(s, e, f)
+	if !found {
+		panic("Path not found")
+	}
+	printPath(shortestPath)
+	ans1 := len(shortestPath) - 1
+	fmt.Printf("[Part 1] Shortest path length: %#v\n", ans1)
 
-	// fmt.Printf("[Part 2] MonkeyBusiness2: %v\n", mb2)
+	shortestPath = shortestPathFromAllLowElevations(s, e, f)
+	printPath(shortestPath)
+	ans2 := len(shortestPath) - 1
+	fmt.Printf("[Part 2] Shortest path among all points with low elevations: %v\n", ans2)
 
-	return 0, 0
+	return ans1, ans2
 }
 
 func main() {

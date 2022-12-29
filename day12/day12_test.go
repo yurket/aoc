@@ -6,12 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// func TestPart1(t *testing.T) {
-// 	monkeyBusiness, _ := solve("my_test_input")
-
-// 	require.Equal(t, 10605, monkeyBusiness)
-// }
-
 func TestParseField(t *testing.T) {
 	start, end, field := parseField("my_test_input")
 
@@ -41,14 +35,12 @@ func TestNeighbours(t *testing.T) {
 }
 
 func TestPart1(t *testing.T) {
-	start, end, field := parseField("my_test_input")
-	shortestPath := BFS(start, end, field)
-	pathLen := len(shortestPath) - 1
-	require.Equal(t, pathLen, 31)
+	sp, _ := solve("my_test_input")
+
+	require.Equal(t, sp, 31)
 }
 
-// func TestPart2(t *testing.T) {
-// 	_, monkeyBusiness := solve("my_test_input")
-
-// 	require.Equal(t, 2713310158, monkeyBusiness)
-// }
+func TestPart2(t *testing.T) {
+	_, sp2 := solve("my_test_input")
+	require.Equal(t, 29, sp2)
+}
