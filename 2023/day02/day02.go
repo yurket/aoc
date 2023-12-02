@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -97,8 +98,29 @@ func solve1(lines []string) int {
 	return idSum
 }
 
+func minSetsPower(game Game) int {
+	var reds, greens, blues []int
+	for _, set := range game.sets {
+		reds = append(reds, set.red)
+		greens = append(greens, set.green)
+		blues = append(blues, set.blue)
+	}
+
+	return slices.Max(reds) * slices.Max(greens) * slices.Max(blues)
+}
+
+func solve2(lines []string) int {
+	powerSum := 0
+	for _, line := range lines {
+		game := lineToGame(line)
+		powerSum += minSetsPower(game)
+	}
+	return powerSum
+
+}
+
 func main() {
 	lines := readLines("input")
 	fmt.Println("Solution 1 is ", solve1(lines))
-	// fmt.Println("Solution 2 is ", solve2(lines))
+	fmt.Println("Solution 2 is ", solve2(lines))
 }

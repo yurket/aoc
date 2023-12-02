@@ -20,12 +20,8 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, 8, solve1(lines))
 }
 
-// func TestWordsToNum(t *testing.T) {
-// 	lines := readLines("my_test_input2")
-// }
+func TestSolve2(t *testing.T) {
+	lines := readLines("my_test_input")
 
-// func TestSolve2(t *testing.T) {
-// 	lines := readLines("my_test_input2")
-
-// 	require.Equal(t, 281, solve2(lines))
-// }
+	require.Equal(t, 2286, solve2(lines))
+}
