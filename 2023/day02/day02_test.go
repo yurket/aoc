@@ -9,7 +9,7 @@ import (
 func TestLineToGame(t *testing.T) {
 	line := "Game 100: 3 blue, 3 red, 6 green; 7 red, 2 green, 16 blue; 14 green, 9 red, 9 blue; 8 red, 10 green, 9 blue; 6 blue, 11 red"
 
-	game := lineToGame(line)
+	game := NewGame(line)
 
 	require.Equal(t, game.id, 100)
 }

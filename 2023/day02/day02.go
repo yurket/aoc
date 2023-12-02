@@ -27,21 +27,7 @@ type Set struct {
 	blue  int
 }
 
-type Game struct {
-	id   int
-	sets []Set
-}
-
-func (g Game) isPossible(maxR, maxG, maxB int) bool {
-	for _, set := range g.sets {
-		if set.red > maxR || set.green > maxG || set.blue > maxB {
-			return false
-		}
-	}
-	return true
-}
-
-func stringToSet(s string) Set {
+func NewSet(s string) Set {
 	set := Set{}
 	for _, numColorPair := range strings.Split(s, ",") {
 		numColorPair = strings.TrimSpace(numColorPair)
@@ -68,7 +54,12 @@ func stringToSet(s string) Set {
 	return set
 }
 
-func lineToGame(line string) Game {
+type Game struct {
+	id   int
+	sets []Set
+}
+
+func NewGame(line string) Game {
 	var game Game
 	_, err := fmt.Sscanf(line, "Game %d:", &game.id)
 	if err != nil {
@@ -79,28 +70,26 @@ func lineToGame(line string) Game {
 	colonIndex := strings.Index(line, ":")
 	setStrings := strings.Split(line[colonIndex+1:], ";")
 	for _, setString := range setStrings {
-		// fmt.Printf("Set:%+v\n", stringToSet(setString))
-		game.sets = append(game.sets, stringToSet(setString))
+		// fmt.Printf("Set:%+v\n", NewSet(setString))
+		game.sets = append(game.sets, NewSet(setString))
 	}
 
 	// fmt.Printf("Game:%+v\n", game)
 	return game
 }
 
-func solve1(lines []string) int {
-	idSum := 0
-	for _, line := range lines {
-		game := lineToGame(line)
-		if game.isPossible(12, 13, 14) {
-			idSum += game.id
+func (g Game) isPossible(maxR, maxG, maxB int) bool {
+	for _, set := range g.sets {
+		if set.red > maxR || set.green > maxG || set.blue > maxB {
+			return false
 		}
 	}
-	return idSum
+	return true
 }
 
-func minSetsPower(game Game) int {
+func (g Game) minSetsPower() int {
 	var reds, greens, blues []int
-	for _, set := range game.sets {
+	for _, set := range g.sets {
 		reds = append(reds, set.red)
 		greens = append(greens, set.green)
 		blues = append(blues, set.blue)
@@ -109,11 +98,22 @@ func minSetsPower(game Game) int {
 	return slices.Max(reds) * slices.Max(greens) * slices.Max(blues)
 }
 
+func solve1(lines []string) int {
+	idSum := 0
+	for _, line := range lines {
+		game := NewGame(line)
+		if game.isPossible(12, 13, 14) {
+			idSum += game.id
+		}
+	}
+	return idSum
+}
+
 func solve2(lines []string) int {
 	powerSum := 0
 	for _, line := range lines {
-		game := lineToGame(line)
-		powerSum += minSetsPower(game)
+		game := NewGame(line)
+		powerSum += game.minSetsPower()
 	}
 	return powerSum
 
