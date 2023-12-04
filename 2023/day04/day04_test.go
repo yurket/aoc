@@ -21,8 +21,28 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, 13, solve1(cards))
 }
 
+func TestCardsToCopies(t *testing.T) {
+	cards := readCards("test_input")
+
+	cToC := cardsToCopies(cards)
+	require.Equal(t, []int{1, 2, 3, 4}, cToC[0])
+	require.Equal(t, []int{2, 3}, cToC[1])
+	require.Equal(t, []int{3, 4}, cToC[2])
+	require.Equal(t, []int{4}, cToC[3])
+	require.Equal(t, []int{}, cToC[4])
+}
+
+func TestPopLast(t *testing.T) {
+	list := []int{1, 2, 3}
+
+	list, el := popLast(list)
+
+	require.Equal(t, 3, el)
+	require.Equal(t, []int{1, 2}, list)
+}
+
 func TestSolve2(t *testing.T) {
 	cards := readCards("test_input")
 
-	require.Equal(t, 2286, solve2(cards))
+	require.Equal(t, 30, solve2(cards))
 }

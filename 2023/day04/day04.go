@@ -97,8 +97,54 @@ func solve1(cards []Card) int {
 	return totalPoints
 }
 
+func cardsToCopies(cards []Card) map[int][]int {
+	cardCopies := map[int][]int{}
+	for i, card := range cards {
+		winSet := toSet(card.winning)
+		nextCopy := i + 1
+		cardCopies[i] = []int{}
+		for _, n := range card.my {
+			if _, exists := winSet[n]; exists {
+				cardCopies[i] = append(cardCopies[i], nextCopy)
+				nextCopy += 1
+			}
+		}
+	}
+	return cardCopies
+}
+
+// huge difference (~200 vs ~1.5M) in unprocessed queue length,
+// dependingn on whether to pop from the end or from the beginning
+func popLast(slice []int) ([]int, int) {
+	last := slice[len(slice)-1]
+	slice = slice[:len(slice)-1]
+	return slice, last
+	// first := slice[0]
+	// slice = slice[1:]
+	// return slice, first
+}
+
 func solve2(cards []Card) int {
-	return 0
+	cToC := cardsToCopies(cards)
+	processedCardsNum := 0
+	unprocessed := []int{}
+	for i, _ := range cards {
+		unprocessed = append(unprocessed, i)
+	}
+
+	// just curious
+	maxUnprocessedCards := 0
+	for len(unprocessed) != 0 {
+		lastCard := 0
+		unprocessed, lastCard = popLast(unprocessed)
+		processedCardsNum += 1
+		unprocessed = append(unprocessed, cToC[lastCard]...)
+		if len(unprocessed) > maxUnprocessedCards {
+			maxUnprocessedCards = len(unprocessed)
+		}
+	}
+	fmt.Printf("Max unprocessed cards len: %d\n", maxUnprocessedCards)
+	return processedCardsNum
 }
 
 func main() {
