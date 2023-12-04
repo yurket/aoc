@@ -32,21 +32,21 @@ func readSchematic(filename string) Schematic {
 	return schematic
 }
 
+type Coord struct {
+	x, y int
+}
 type Part struct {
 	number           int
 	adjacentToSymbol bool
+	gear             Coord
 }
 
-func isAdjacentToSymbol(i, j int, schematic Schematic) bool {
+func isAdjacentToSymbolOrGear(i, j int, schematic Schematic) (bool, bool, Coord) {
 	if len(schematic) == 0 {
 		panic("Empty schemamtic!")
 	}
 
 	rows, cols := len(schematic), len(schematic[0])
-
-	type Coord struct {
-		x, y int
-	}
 
 	nearCoords := []Coord{}
 	for _, x := range []int{i - 1, i, i + 1} {
@@ -61,10 +61,14 @@ func isAdjacentToSymbol(i, j int, schematic Schematic) bool {
 	for _, coord := range nearCoords {
 		char := schematic[coord.x][coord.y]
 		if !unicode.IsDigit(char) && char != '.' {
-			return true
+			symbol := true
+			if char == '*' {
+				return symbol, true, coord
+			}
+			return symbol, false, Coord{0, 0}
 		}
 	}
-	return false
+	return false, false, Coord{0, 0}
 }
 
 func savePart(number *string, part *Part, parts []Part) []Part {
@@ -93,7 +97,13 @@ func parseParts(schematic Schematic) []Part {
 			if unicode.IsDigit(schematic[i][j]) {
 				isDigit = true
 				number += string(schematic[i][j])
-				part.adjacentToSymbol = part.adjacentToSymbol || isAdjacentToSymbol(i, j, schematic)
+				isAdj, isGear, coord := isAdjacentToSymbolOrGear(i, j, schematic)
+				if isAdj {
+					part.adjacentToSymbol = true
+				}
+				if isGear {
+					part.gear = coord
+				}
 
 				lastIndexInTheLine := len(schematic[i]) - 1
 				if j == lastIndexInTheLine {
@@ -107,7 +117,7 @@ func parseParts(schematic Schematic) []Part {
 				isDigit = false
 			}
 		}
-		fmt.Println()
+		// fmt.Println()
 	}
 	// fmt.Printf("%+v\n", parts)
 	return parts
@@ -126,12 +136,28 @@ func solve1(schematic Schematic) int {
 	return partsSum
 }
 
-// func solve2(lines []string) int {
-// 	return 0
-// }
+func solve2(schematic Schematic) int {
+	parts := parseParts(schematic)
+
+	gearsToPartNums := map[Coord][]int{}
+	for _, part := range parts {
+		zero := Coord{0, 0}
+		if part.gear != zero {
+			gearsToPartNums[part.gear] = append(gearsToPartNums[part.gear], part.number)
+		}
+	}
+
+	sum := 0
+	for _, partNums := range gearsToPartNums {
+		if len(partNums) == 2 {
+			sum += partNums[0] * partNums[1]
+		}
+	}
+	return sum
+}
 
 func main() {
 	schematic := readSchematic("input")
 	fmt.Println("Solution 1 is ", solve1(schematic))
-	// fmt.Println("Solution 2 is ", solve2(lines))
+	fmt.Println("Solution 2 is ", solve2(schematic))
 }
