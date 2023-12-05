@@ -17,7 +17,6 @@ func TestParseInput(t *testing.T) {
 
 	require.Equal(t, Range{56, 56 + 37, 4}, maps[6][0])
 	require.Equal(t, Range{93, 93 + 4, -37}, maps[6][1])
-
 }
 
 func TestSolve1(t *testing.T) {
@@ -26,8 +25,14 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, int64(35), solve1(seeds, maps))
 }
 
-// func TestSolve2(t *testing.T) {
-// 	lines := parseInput("test_input")
+func TestParseInput2(t *testing.T) {
+	seedRanges, _ := parseInput2("test_input")
 
-// 	require.Equal(t, 2286, solve2(lines))
-// }
+	require.Equal(t, SeedRanges{Range{79, 79 + 14, 0}, Range{55, 55 + 13, 0}}, seedRanges)
+}
+
+func TestSolve2(t *testing.T) {
+	seedRanges, maps := parseInput2("test_input")
+
+	require.Equal(t, int64(46), solve2(seedRanges, maps))
+}

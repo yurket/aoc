@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
-	"slices"
 	"strconv"
 	"strings"
 )
 
 type Seeds []int64
+type SeedRanges []Range
 
 type Range struct {
 	srcStart  int64
@@ -30,6 +31,27 @@ func parseSeeds(line string) Seeds {
 		seeds = append(seeds, int64(seed))
 	}
 	return seeds
+}
+
+func parseSeeds2(line string) SeedRanges {
+	seedsS := line[strings.Index(line, ":")+1:]
+	seedsS = strings.TrimSpace(seedsS)
+	var seedRanges SeedRanges
+	seedRange := Range{}
+	for i, x := range strings.Split(seedsS, " ") {
+		num, err := strconv.Atoi(x)
+		if err != nil {
+			panic(err)
+		}
+		if i%2 == 0 {
+			seedRange.srcStart = int64(num)
+		} else {
+			seedRange.srcEnd = seedRange.srcStart + int64(num)
+			seedRanges = append(seedRanges, seedRange)
+			seedRange = Range{}
+		}
+	}
+	return seedRanges
 }
 
 func parseMaps(lines []string) Maps {
@@ -71,29 +93,69 @@ func parseInput(filename string) (Seeds, Maps) {
 	return seeds, maps
 }
 
-func solve1(seeds Seeds, maps Maps) int64 {
-	locations := []int64{}
-
-	for _, seed := range seeds {
-		for _, mapping := range maps {
-			for _, r := range mapping {
-				if seed >= r.srcStart && seed < r.srcEnd {
-					seed += r.dstAdjust
-					break
-				}
-			}
-		}
-		locations = append(locations, seed)
+func parseInput2(filename string) (SeedRanges, Maps) {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
 	}
-	return slices.Min(locations)
+
+	lines := strings.Split(string(content), "\n")
+	seedRanges := parseSeeds2(lines[0])
+	maps := parseMaps(lines[2:])
+
+	return seedRanges, maps
 }
 
-func solve2(lines []string) int {
-	return 0
+func mapSeed(seed int64, maps Maps) int64 {
+	// fmt.Printf("\nSeed %d", seed)
+	for _, mapping := range maps {
+		for _, r := range mapping {
+			// fmt.Printf(" -> %d ", seed+r.dstAdjust)
+			if seed >= r.srcStart && seed < r.srcEnd {
+				seed += r.dstAdjust
+				break
+			}
+		}
+	}
+	return seed
+}
+
+func solve1(seeds Seeds, maps Maps) int64 {
+	var minLocation int64 = math.MaxInt64
+
+	for _, seed := range seeds {
+		seed = mapSeed(seed, maps)
+		if seed < minLocation {
+			minLocation = seed
+		}
+	}
+	return minLocation
+}
+
+func solve2(seedRanges SeedRanges, maps Maps) int64 {
+	var minLocation int64 = math.MaxInt64
+
+	for ii, seedRange := range seedRanges {
+		i := int64(0)
+		for startSeed := seedRange.srcStart; startSeed < seedRange.srcEnd; startSeed++ {
+			i++
+			if i%100000000 == 0 {
+				fmt.Println("100M")
+			}
+			seed := mapSeed(startSeed, maps)
+			if seed < minLocation {
+				minLocation = seed
+			}
+		}
+		fmt.Printf("Range %d out of %d\n", ii, len(seedRanges))
+	}
+	return minLocation
 }
 
 func main() {
 	seeds, maps := parseInput("input")
 	fmt.Println("Solution 1 is ", solve1(seeds, maps))
-	// fmt.Println("Solution 2 is ", solve2(lines))
+
+	seedRanges, maps := parseInput2("input")
+	fmt.Println("Solution 2 is ", solve2(seedRanges, maps))
 }
