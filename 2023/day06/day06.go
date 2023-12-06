@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"github.com/yurket/aoc/util"
 )
 
 type Race struct {
@@ -12,9 +14,9 @@ type Race struct {
 }
 
 func readRaces(filename string) []Race {
-	lines := readLines(filename)
-	times := parseSlice(lines[0][strings.Index(lines[0], ":")+1:])
-	distances := parseSlice(lines[1][strings.Index(lines[1], ":")+1:])
+	lines := util.ReadLines(filename)
+	times := util.ParseSlice(lines[0][strings.Index(lines[0], ":")+1:])
+	distances := util.ParseSlice(lines[1][strings.Index(lines[1], ":")+1:])
 
 	races := []Race{}
 	for i, _ := range times {
@@ -41,7 +43,7 @@ func parseNumber(s string) int {
 }
 
 func readRaces2(filename string) []Race {
-	lines := readLines(filename)
+	lines := util.ReadLines(filename)
 	time := parseNumber(lines[0][strings.Index(lines[0], ":")+1:])
 	distance := parseNumber(lines[1][strings.Index(lines[1], ":")+1:])
 
