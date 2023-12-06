@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -12,34 +11,8 @@ type Race struct {
 	distance int
 }
 
-func parseSlice(s string) []int {
-	s = strings.TrimSpace(s)
-
-	slice := []int{}
-	for _, x := range strings.Split(s, " ") {
-		if x == "" {
-			continue
-		}
-
-		n, err := strconv.Atoi(x)
-		if err != nil {
-			panic(err)
-		}
-		slice = append(slice, n)
-	}
-	return slice
-}
-
 func readRaces(filename string) []Race {
-	content, err := os.ReadFile(filename)
-	if err != nil {
-		panic(err)
-	}
-	lines := strings.Split(string(content), "\n")
-	for lines[len(lines)-1] == "" {
-		lines = lines[:len(lines)-1]
-	}
-
+	lines := readLines(filename)
 	times := parseSlice(lines[0][strings.Index(lines[0], ":")+1:])
 	distances := parseSlice(lines[1][strings.Index(lines[1], ":")+1:])
 
@@ -49,6 +22,30 @@ func readRaces(filename string) []Race {
 		races = append(races, r)
 	}
 	return races
+}
+
+func parseNumber(s string) int {
+	removeSpaces := func(r rune) rune {
+		if r == ' ' {
+			return -1
+		}
+		return r
+	}
+	s = strings.Map(removeSpaces, s)
+	n, err := strconv.Atoi(s)
+	if err != nil {
+		panic(err)
+	}
+
+	return n
+}
+
+func readRaces2(filename string) []Race {
+	lines := readLines(filename)
+	time := parseNumber(lines[0][strings.Index(lines[0], ":")+1:])
+	distance := parseNumber(lines[1][strings.Index(lines[1], ":")+1:])
+
+	return []Race{{time, distance}}
 }
 
 func countOptions(races []Race) int {
@@ -70,12 +67,9 @@ func solve1(races []Race) int {
 	return countOptions(races)
 }
 
-func solve2(races []Race) int {
-	return 0
-}
-
 func main() {
 	races := readRaces("input")
 	fmt.Println("Solution 1 is ", solve1(races))
-	fmt.Println("Solution 2 is ", solve2(races))
+	races = readRaces2("input")
+	fmt.Println("Solution 2 is ", solve1(races))
 }

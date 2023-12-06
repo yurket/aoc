@@ -19,8 +19,9 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, 288, solve1(races))
 }
 
-// func TestSolve2(t *testing.T) {
-// races := readRaces("test_input")
+func TestReadRaces2(t *testing.T) {
+	races := readRaces2("test_input")
 
-// 	require.Equal(t, 2286, solve2(lines))
-// }
+	expected := []Race{{71530, 940200}}
+	require.Equal(t, expected, races)
+}
