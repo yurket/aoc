@@ -1,6 +1,7 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
 	"slices"
 	"strconv"
@@ -8,6 +9,22 @@ import (
 
 	"github.com/yurket/aoc/util"
 )
+
+var cardStrengths = map[rune]int{
+	'A': 13,
+	'K': 12,
+	'Q': 11,
+	'J': 10,
+	'T': 9,
+	'9': 8,
+	'8': 7,
+	'7': 6,
+	'6': 5,
+	'5': 4,
+	'4': 3,
+	'3': 2,
+	'2': 1,
+}
 
 type HandType int
 
@@ -78,8 +95,33 @@ func parseHands(filename string) Hands {
 	return hands
 }
 
-func solve1(lines Hands) int {
-	return 0
+func sortHands(hands Hands) {
+	comparator := func(a, b Hand) int {
+		if a.type_ == b.type_ {
+			for i := range a.cards {
+				aStrength := cardStrengths[rune(a.cards[i])]
+				bStrength := cardStrengths[rune(b.cards[i])]
+				if aStrength == bStrength {
+					continue
+				}
+				return cmp.Compare(aStrength, bStrength)
+			}
+		}
+		return cmp.Compare(a.type_, b.type_)
+	}
+
+	slices.SortFunc(hands, comparator)
+}
+
+func solve1(hands Hands) int {
+	sortHands(hands)
+
+	totalWinnings := 0
+	for i, hand := range hands {
+		totalWinnings += (i + 1) * hand.bid
+	}
+
+	return totalWinnings
 }
 
 // func solve2(lines []string) int {

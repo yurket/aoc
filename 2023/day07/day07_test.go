@@ -39,11 +39,26 @@ func TestReadHands(t *testing.T) {
 	require.Equal(t, expected, hands)
 }
 
-// func TestSolve1(t *testing.T) {
-// 	lines := readHands("test_input")
+func TestSortHands(t *testing.T) {
+	hands := parseHands("test_input")
 
-// 	require.Equal(t, 8, solve1(lines))
-// }
+	sortHands(hands)
+
+	sortedExpected := Hands{
+		{"32T3K", OnePair, 765},
+		{"KTJJT", TwoPairs, 220},
+		{"KK677", TwoPairs, 28},
+		{"T55J5", ThreeOfAKind, 684},
+		{"QQQJA", ThreeOfAKind, 483},
+	}
+	require.Equal(t, sortedExpected, hands)
+}
+
+func TestSolve1(t *testing.T) {
+	hands := parseHands("test_input")
+
+	require.Equal(t, 6440, solve1(hands))
+}
 
 // func TestSolve2(t *testing.T) {
 // 	lines := readHands("test_input")
