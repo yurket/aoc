@@ -27,7 +27,7 @@ func TestGetHandType(t *testing.T) {
 }
 
 func TestReadHands(t *testing.T) {
-	hands := parseHands("test_input")
+	hands := parseHands("test_input", getHandType)
 
 	expected := Hands{
 		{"32T3K", OnePair, 765},
@@ -40,7 +40,7 @@ func TestReadHands(t *testing.T) {
 }
 
 func TestSortHands(t *testing.T) {
-	hands := parseHands("test_input")
+	hands := parseHands("test_input", getHandType)
 
 	sortHands(hands)
 
@@ -55,13 +55,13 @@ func TestSortHands(t *testing.T) {
 }
 
 func TestSolve1(t *testing.T) {
-	hands := parseHands("test_input")
+	hands := parseHands("test_input", getHandType)
 
 	require.Equal(t, 6440, solve1(hands))
 }
 
-// func TestSolve2(t *testing.T) {
-// 	lines := readHands("test_input")
+func TestSolve2(t *testing.T) {
+	hands := parseHands("test_input", getHandType2)
 
-// 	require.Equal(t, 2286, solve2(lines))
-// }
+	require.Equal(t, 5905, solve1(hands))
+}

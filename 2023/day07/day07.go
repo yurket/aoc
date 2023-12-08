@@ -11,19 +11,20 @@ import (
 )
 
 var cardStrengths = map[rune]int{
-	'A': 13,
-	'K': 12,
-	'Q': 11,
-	'J': 10,
-	'T': 9,
-	'9': 8,
-	'8': 7,
-	'7': 6,
-	'6': 5,
-	'5': 4,
-	'4': 3,
-	'3': 2,
-	'2': 1,
+	'A': 14,
+	'K': 13,
+	'Q': 12,
+	// 'J': 11,
+	'T': 10,
+	'9': 9,
+	'8': 8,
+	'7': 7,
+	'6': 6,
+	'5': 5,
+	'4': 4,
+	'3': 3,
+	'2': 2,
+	'J': 1,
 }
 
 type HandType int
@@ -47,25 +48,26 @@ type Hands []Hand
 
 func getHandType(cards string) HandType {
 	if len(cards) != 5 {
-		panic("Wrong cards count!")
+		s := fmt.Sprintf("Wrong cards count: \"%s\"!\n", cards)
+		panic(s)
 	}
 
 	cardCounts := util.NewCounts(cards)
-	counts := []int{}
+	sortedCounts := []int{}
 	for _, count := range cardCounts {
-		counts = append(counts, count)
+		sortedCounts = append(sortedCounts, count)
 	}
-	slices.Sort(counts)
+	slices.Sort(sortedCounts)
 
 	if len(cardCounts) == 1 {
 		return FiveOfAKind
 	} else if len(cardCounts) == 2 {
-		if util.SlicesEqual(counts, []int{1, 4}) {
+		if util.SlicesEqual(sortedCounts, []int{1, 4}) {
 			return FourOfAKind
 		}
 		return FullHouse
 	} else if len(cardCounts) == 3 {
-		if counts[2] == 3 {
+		if sortedCounts[2] == 3 {
 			return ThreeOfAKind
 		}
 		return TwoPairs
@@ -76,7 +78,31 @@ func getHandType(cards string) HandType {
 	}
 }
 
-func parseHands(filename string) Hands {
+func getHandType2(cards string) HandType {
+	if strings.Contains(cards, "J") {
+		// replace J with the card with more counts (if not counting 'J's)
+		cardsWithoutJs := strings.ReplaceAll(cards, "J", "")
+		if cardsWithoutJs == "" {
+			return FiveOfAKind
+		}
+		cardCounts := util.NewCounts(cardsWithoutJs)
+		var maxCount int
+		var maxCountCard string
+
+		for card, count := range cardCounts {
+			if count > maxCount {
+				maxCount = count
+				maxCountCard = string(card)
+			}
+		}
+
+		cards = strings.ReplaceAll(cards, "J", maxCountCard)
+	}
+
+	return getHandType(cards)
+}
+
+func parseHands(filename string, getHandTypeFunc func(string) HandType) Hands {
 	lines := util.ReadLines(filename)
 
 	hands := Hands{}
@@ -87,7 +113,7 @@ func parseHands(filename string) Hands {
 			panic(err)
 		}
 		cards := s[0]
-		handType := getHandType(cards)
+		handType := getHandTypeFunc(cards)
 
 		hands = append(hands, Hand{cards, handType, bid})
 	}
@@ -124,12 +150,9 @@ func solve1(hands Hands) int {
 	return totalWinnings
 }
 
-// func solve2(lines []string) int {
-// 	return 0
-// }
-
 func main() {
-	hands := parseHands("input")
+	hands := parseHands("input", getHandType)
 	fmt.Println("Solution 1 is ", solve1(hands))
-	// fmt.Println("Solution 2 is ", solve2(hands))
+	hands2 := parseHands("input", getHandType2)
+	fmt.Println("Solution 2 is ", solve1(hands2))
 }
