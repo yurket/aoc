@@ -21,8 +21,6 @@ func TestSolve12(t *testing.T) {
 	require.Equal(t, 6, solve1(parseInput("test_input2")))
 }
 
-// func TestSolve2(t *testing.T) {
-// 	lines := parseInput("test_input")
-
-// 	require.Equal(t, 2286, solve2(lines))
-// }
+func TestSolve2(t *testing.T) {
+	require.Equal(t, 6, solve2(parseInput("test_input3")))
+}

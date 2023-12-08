@@ -64,11 +64,55 @@ func solve1(moves string, nodeMap NodesMap) int {
 	}
 }
 
-func solve2(lines []string) int {
-	return 0
+func collectStartingNodes(nodeMap NodesMap) []string {
+	startNodes := []string{}
+	for nodeS, _ := range nodeMap {
+		if strings.HasSuffix(nodeS, "A") {
+			startNodes = append(startNodes, nodeS)
+		}
+	}
+	return startNodes
+}
+
+func allEndsWithZ(nodeStrings []string, step int) bool {
+	allEndsWithZ := true
+	for i, nodeS := range nodeStrings {
+		if strings.HasSuffix(nodeS, "Z") {
+			fmt.Printf("[%d] %s ends with Z on step %d\n", i, nodeS, step)
+		} else {
+			allEndsWithZ = false
+		}
+	}
+	return allEndsWithZ
+}
+
+func solve2(moves string, nodeMap NodesMap) int {
+	var steps, i int
+	startNodes := collectStartingNodes(nodeMap)
+	for {
+		i += 1
+		for _, move := range moves {
+			for ii, _ := range startNodes {
+				nextNodeS := &startNodes[ii]
+				if move == 'R' {
+					*nextNodeS = nodeMap[*nextNodeS].R
+				} else {
+					*nextNodeS = nodeMap[*nextNodeS].L
+				}
+			}
+			steps += 1
+			if allEndsWithZ(startNodes, steps) {
+				fmt.Printf("%d iterations passed\n", i)
+				return steps
+			}
+		}
+	}
 }
 
 func main() {
 	fmt.Println("Solution 1 is ", solve1(parseInput("input")))
-	// fmt.Println("Solution 2 is ", solve2(lines))
+	fmt.Println("Solution 2 is ", solve2(parseInput("input")))
 }
+
+// Find LCM in wolfram alpha of these folks:
+// 12083, 13207, 14893, 16579, 20513, 22199
