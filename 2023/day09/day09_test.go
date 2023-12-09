@@ -20,22 +20,25 @@ func TestParseInput(t *testing.T) {
 func TestFindNextSeqElement(t *testing.T) {
 	sequences := parseInput("test_input")
 
-	require.Equal(t, 18, findNextSequenceElement(sequences[0]))
-	require.Equal(t, 28, findNextSequenceElement(sequences[1]))
-	require.Equal(t, 68, findNextSequenceElement(sequences[2]))
-}
+	first, last := findNextSequenceElement(sequences[0])
+	require.Equal(t, 18, last)
+	require.Equal(t, -3, first)
 
-func TestFindNextSeqElement2(t *testing.T) {
-	sequences := parseInput("my_test_input")
+	first, last = findNextSequenceElement(sequences[1])
+	require.Equal(t, 28, last)
+	require.Equal(t, 0, first)
 
-	require.Equal(t, 3, findNextSequenceElement(sequences[0]))
-	require.Equal(t, 7, findNextSequenceElement(sequences[1]))
+	first, last = findNextSequenceElement(sequences[2])
+	require.Equal(t, 68, last)
+	require.Equal(t, 5, first)
 }
 
 func TestSolve1(t *testing.T) {
 	sequences := parseInput("test_input")
 
-	require.Equal(t, 114, solve1(sequences))
+	firstSum, lastSum := solve(sequences)
+	require.Equal(t, 114, lastSum)
+	require.Equal(t, 2, firstSum)
 }
 
 // func TestSolve2(t *testing.T) {

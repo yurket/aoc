@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/yurket/aoc/util"
 )
@@ -15,37 +16,40 @@ func parseInput(filename string) [][]int {
 	return sequences
 }
 
-func findNextSequenceElement(sequence []int) int {
+func findNextSequenceElement(sequence []int) (int, int) {
 	currentDifferences := []int{}
 	lastElementsSum := sequence[len(sequence)-1]
+	firstElementsDiff := sequence[0]
 
+	signChange := 0
 	for util.Sum(sequence) != 0 {
 		for i := 0; i < len(sequence)-1; i++ {
 			currentDifferences = append(currentDifferences, sequence[i+1]-sequence[i])
 		}
 		lastElement := currentDifferences[len(currentDifferences)-1]
 		lastElementsSum += lastElement
+		firstElementsDiff -= (currentDifferences[0] * int(math.Pow(-1, float64(signChange%2))))
 		sequence = currentDifferences
 		currentDifferences = []int{}
+		signChange += 1
 	}
-	return lastElementsSum
+	return firstElementsDiff, lastElementsSum
 }
 
-func solve1(sequences [][]int) int {
-	sum := 0
+func solve(sequences [][]int) (int, int) {
+	var firstSum, lastSum int
 	for _, sequence := range sequences {
-		sum += findNextSequenceElement(sequence)
+		first, last := findNextSequenceElement(sequence)
+		firstSum += first
+		lastSum += last
+
 	}
-	return sum
-}
-
-func solve2(sequences [][]int) int {
-
-	return 0
+	return firstSum, lastSum
 }
 
 func main() {
 	sequences := parseInput("input")
-	fmt.Println("Solution 1 is ", solve1(sequences))
-	fmt.Println("Solution 2 is ", solve2(sequences))
+	firstSum, lastSum := solve(sequences)
+	fmt.Println("Solution 1 is ", lastSum)
+	fmt.Println("Solution 2 is ", firstSum)
 }
