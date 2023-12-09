@@ -16,7 +16,7 @@ func parseInput(filename string) [][]int {
 	return sequences
 }
 
-func findNextSequenceElement(sequence []int) (int, int) {
+func extrapolateFirstAndLast(sequence []int) (int, int) {
 	currentDifferences := []int{}
 	lastElementsSum := sequence[len(sequence)-1]
 	firstElementsDiff := sequence[0]
@@ -26,8 +26,7 @@ func findNextSequenceElement(sequence []int) (int, int) {
 		for i := 0; i < len(sequence)-1; i++ {
 			currentDifferences = append(currentDifferences, sequence[i+1]-sequence[i])
 		}
-		lastElement := currentDifferences[len(currentDifferences)-1]
-		lastElementsSum += lastElement
+		lastElementsSum += currentDifferences[len(currentDifferences)-1]
 		firstElementsDiff -= (currentDifferences[0] * int(math.Pow(-1, float64(signChange%2))))
 		sequence = currentDifferences
 		currentDifferences = []int{}
@@ -39,7 +38,7 @@ func findNextSequenceElement(sequence []int) (int, int) {
 func solve(sequences [][]int) (int, int) {
 	var firstSum, lastSum int
 	for _, sequence := range sequences {
-		first, last := findNextSequenceElement(sequence)
+		first, last := extrapolateFirstAndLast(sequence)
 		firstSum += first
 		lastSum += last
 

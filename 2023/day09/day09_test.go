@@ -20,15 +20,15 @@ func TestParseInput(t *testing.T) {
 func TestFindNextSeqElement(t *testing.T) {
 	sequences := parseInput("test_input")
 
-	first, last := findNextSequenceElement(sequences[0])
+	first, last := extrapolateFirstAndLast(sequences[0])
 	require.Equal(t, 18, last)
 	require.Equal(t, -3, first)
 
-	first, last = findNextSequenceElement(sequences[1])
+	first, last = extrapolateFirstAndLast(sequences[1])
 	require.Equal(t, 28, last)
 	require.Equal(t, 0, first)
 
-	first, last = findNextSequenceElement(sequences[2])
+	first, last = extrapolateFirstAndLast(sequences[2])
 	require.Equal(t, 68, last)
 	require.Equal(t, 5, first)
 }
@@ -40,9 +40,3 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, 114, lastSum)
 	require.Equal(t, 2, firstSum)
 }
-
-// func TestSolve2(t *testing.T) {
-// 	lines := readLines("test_input")
-
-// 	require.Equal(t, 2286, solve2(lines))
-// }
