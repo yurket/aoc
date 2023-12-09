@@ -74,21 +74,10 @@ func collectStartingNodes(nodeMap NodesMap) []string {
 	return startNodes
 }
 
-func allEndsWithZ(nodeStrings []string, step int) bool {
-	allEndsWithZ := true
-	for i, nodeS := range nodeStrings {
-		if strings.HasSuffix(nodeS, "Z") {
-			fmt.Printf("[%d] %s ends with Z on step %d\n", i, nodeS, step)
-		} else {
-			allEndsWithZ = false
-		}
-	}
-	return allEndsWithZ
-}
-
 func solve2(moves string, nodeMap NodesMap) int {
 	var steps, i int
 	startNodes := collectStartingNodes(nodeMap)
+	nodesSteps := map[string]int{}
 	for {
 		i += 1
 		for _, move := range moves {
@@ -101,9 +90,24 @@ func solve2(moves string, nodeMap NodesMap) int {
 				}
 			}
 			steps += 1
-			if allEndsWithZ(startNodes, steps) {
-				fmt.Printf("%d iterations passed\n", i)
-				return steps
+			for i, nodeS := range startNodes {
+				if strings.HasSuffix(nodeS, "Z") {
+					if _, exists := nodesSteps[nodeS]; !exists {
+						nodesSteps[nodeS] = steps
+					}
+					fmt.Printf("[%d] %s ends with Z on step %d\n", i, nodeS, steps)
+				}
+			}
+
+			if len(startNodes) == len(nodesSteps) {
+				firstSteps := []int{}
+				for _, s := range nodesSteps {
+					firstSteps = append(firstSteps, s)
+				}
+
+				fmt.Printf("Steps for each start node: %+v\n", firstSteps)
+				// return LCM(firstSteps...)
+				return 0
 			}
 		}
 	}
