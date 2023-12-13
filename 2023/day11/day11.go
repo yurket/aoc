@@ -61,6 +61,7 @@ func expandUniverse(universe Universe) Universe {
 		for i := 0; i < len(map2d); i++ {
 			if map2d[i][j] == '#' {
 				galaxyPresent = true
+				universe.galaxies = append(universe.galaxies, Point{i, j})
 			}
 		}
 		if !galaxyPresent {
@@ -68,18 +69,14 @@ func expandUniverse(universe Universe) Universe {
 		}
 	}
 
-	for i, line := range map2d {
-		for j, ch := range line {
-			if ch == '#' {
-				universe.galaxies = append(universe.galaxies, Point{i, j})
-			}
-		}
-	}
-
 	return universe
 }
 
 func solve1(u Universe, expansionRatio int) int {
+	if expansionRatio > 1 {
+		// account for "double counting" of expanded rows/cols
+		expansionRatio = expansionRatio - 1
+	}
 	sum := 0
 	for i, g1 := range u.galaxies {
 		for _, g2 := range u.galaxies[i+1:] {
@@ -95,7 +92,7 @@ func solve1(u Universe, expansionRatio int) int {
 				}
 			}
 
-			path := int(math.Abs(float64(g2.row-g1.row))+math.Abs(float64(g2.col-g1.col))) + (expandedCols+expandedRows)*(expansionRatio-1)
+			path := int(math.Abs(float64(g2.row-g1.row))+math.Abs(float64(g2.col-g1.col))) + (expandedCols+expandedRows)*expansionRatio
 			sum += path
 		}
 	}
