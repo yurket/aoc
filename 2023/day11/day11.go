@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/yurket/aoc/util"
@@ -15,8 +14,10 @@ type Point struct {
 }
 
 type Universe struct {
-	map2d    [][]rune
-	galaxies []Point
+	map2d        [][]rune
+	galaxies     []Point
+	rowsToExpand []int
+	colsToExpand []int
 }
 
 func (u Universe) print() {
@@ -48,14 +49,14 @@ func readUniverse(filename string) Universe {
 func expandUniverse(universe Universe) Universe {
 	universe.print()
 	map2d := universe.map2d
-	for i := len(map2d) - 1; i >= 0; i-- {
+	for i := 0; i < len(map2d); i++ {
 		set := util.NewRuneSet(string(map2d[i]))
 		if len(set) == 1 {
-			map2d = slices.Insert(map2d, i, map2d[i])
+			universe.rowsToExpand = append(universe.rowsToExpand, i)
 		}
 	}
 
-	for j := len(map2d[0]) - 1; j >= 0; j-- {
+	for j := 0; j < len(map2d[0]); j++ {
 		var galaxyPresent bool
 		for i := 0; i < len(map2d); i++ {
 			if map2d[i][j] == '#' {
@@ -63,9 +64,7 @@ func expandUniverse(universe Universe) Universe {
 			}
 		}
 		if !galaxyPresent {
-			for i := 0; i < len(map2d); i++ {
-				map2d[i] = slices.Insert(map2d[i], j+1, '.')
-			}
+			universe.colsToExpand = append(universe.colsToExpand, j)
 		}
 	}
 
@@ -77,29 +76,34 @@ func expandUniverse(universe Universe) Universe {
 		}
 	}
 
-	universe.map2d = map2d
-	println("\nAfter expansion:")
-	universe.print()
 	return universe
 }
 
-func solve1(u Universe) int {
+func solve1(u Universe, expansionRatio int) int {
 	sum := 0
 	for i, g1 := range u.galaxies {
 		for _, g2 := range u.galaxies[i+1:] {
-			path := int(math.Abs(float64(g2.row-g1.row)) + math.Abs(float64(g2.col-g1.col)))
+			var expandedRows, expandedCols int
+			for _, row := range u.rowsToExpand {
+				if row > min(g1.row, g2.row) && row < max(g1.row, g2.row) {
+					expandedRows += 1
+				}
+			}
+			for _, col := range u.colsToExpand {
+				if col > min(g1.col, g2.col) && col < max(g1.col, g2.col) {
+					expandedCols += 1
+				}
+			}
+
+			path := int(math.Abs(float64(g2.row-g1.row))+math.Abs(float64(g2.col-g1.col))) + (expandedCols+expandedRows)*(expansionRatio-1)
 			sum += path
 		}
 	}
 	return sum
 }
 
-func solve2(u Universe) int {
-	return 0
-}
-
 func main() {
 	universe := expandUniverse(readUniverse("input"))
-	fmt.Println("Solution 1 is ", solve1(universe))
-	// fmt.Println("Solution 2 is ", solve2(universe))
+	fmt.Println("Solution 1 is ", solve1(universe, 1))
+	fmt.Println("Solution 2 is ", solve1(universe, 1000000))
 }

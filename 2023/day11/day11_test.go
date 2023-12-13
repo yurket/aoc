@@ -18,18 +18,22 @@ func TestExpandUniverse(t *testing.T) {
 
 	expanded := expandUniverse(universe)
 
-	require.Equal(t, 12, len(expanded.map2d))
-	require.Equal(t, 13, len(expanded.map2d[0]))
-
 	require.Equal(t, 9, len(expanded.galaxies))
-	firstFourGalaxies := []Point{{0, 4}, {1, 9}, {2, 0}, {5, 8}}
+	firstFourGalaxies := []Point{{0, 3}, {1, 7}, {2, 0}, {4, 6}}
 	require.Equal(t, firstFourGalaxies, expanded.galaxies[:4])
 }
 
 func TestSolve1(t *testing.T) {
 	universe := expandUniverse(readUniverse("test_input"))
 
-	require.Equal(t, 374, solve1(universe))
+	require.Equal(t, 374, solve1(universe, 1))
+}
+
+func TestSolve1a(t *testing.T) {
+	universe := expandUniverse(readUniverse("test_input"))
+
+	require.Equal(t, 1030, solve1(universe, 10))
+	require.Equal(t, 8410, solve1(universe, 100))
 }
 
 // func TestSolve2(t *testing.T) {
