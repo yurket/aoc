@@ -39,10 +39,13 @@ func isMirrored(s string, left int) bool {
 	return true
 }
 
-func findMirrorColumn(pattern Pattern) int {
+func findMirrorColumn(pattern Pattern, previousMirrorColumn int) int {
 	lineLength := len(pattern[0])
 	mirrorCandidates := map[int]bool{}
 	for i := 0; i < lineLength; i++ {
+		if i == previousMirrorColumn {
+			continue
+		}
 		mirrorCandidates[i] = true
 	}
 
@@ -81,21 +84,70 @@ func traspose(pattern Pattern) Pattern {
 	return p
 }
 
-func findMirrorRow(pattern Pattern) int {
+func findMirrorRow(pattern Pattern, previousMirrorRow int) int {
 	transposed := traspose(pattern)
-	return findMirrorColumn(transposed)
+	return findMirrorColumn(transposed, previousMirrorRow)
 }
 
 func solve1(patterns Patterns) int {
 	sum := 0
 	for _, p := range patterns {
-		sum += findMirrorColumn(p) + 100*findMirrorRow(p)
+		sum += findMirrorColumn(p, -1) + 100*findMirrorRow(p, -1)
 	}
 	return sum
 }
 
+func flip(c rune) rune {
+	switch c {
+	case '.':
+		return '#'
+	case '#':
+		return '.'
+	}
+	panic("Unexpected")
+}
+
+func getFlipped(p Pattern, i, j int) Pattern {
+	ret := Pattern{}
+	for ii, line := range p {
+		var retLine string
+		for jj, char := range line {
+			if ii == i && jj == j {
+				retLine += string(flip(char))
+				continue
+			}
+			retLine += string(char)
+		}
+		ret = append(ret, retLine)
+	}
+	return ret
+}
+
+func getFlippedSum(originalSum int, p Pattern) int {
+	for i, line := range p {
+		for j, _ := range line {
+			previousColumn := findMirrorColumn(p, -1)
+			previousRow := findMirrorRow(p, -1)
+			flippedPattern := getFlipped(p, i, j)
+			candidateSum := findMirrorColumn(flippedPattern, previousColumn-1) + 100*findMirrorRow(flippedPattern, previousRow-1)
+
+			if candidateSum != originalSum && candidateSum != 0 {
+				return candidateSum
+			}
+		}
+	}
+	panic("Couldn't find alternative mirror")
+}
+
 func solve2(patterns Patterns) int {
-	return 0
+	sum := 0
+	for _, p := range patterns {
+		originalSum := findMirrorColumn(p, -1) + 100*findMirrorRow(p, -1)
+		flippedSum := getFlippedSum(originalSum, p)
+		sum += flippedSum
+	}
+	return sum
+
 }
 
 func main() {

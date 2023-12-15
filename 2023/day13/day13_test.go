@@ -32,8 +32,8 @@ func TestIsMirrored(t *testing.T) {
 func TestFindMirrorColumn(t *testing.T) {
 	patterns := readPatterns("test_input")
 
-	require.Equal(t, 4, findMirrorColumn(patterns[0]))
-	require.Equal(t, 0, findMirrorColumn(patterns[1]))
+	require.Equal(t, 4+1, findMirrorColumn(patterns[0], -1))
+	require.Equal(t, 0, findMirrorColumn(patterns[1], -1))
 }
 
 func TestTranspose(t *testing.T) {
@@ -46,8 +46,8 @@ func TestTranspose(t *testing.T) {
 func TestFindMirrorRow(t *testing.T) {
 	patterns := readPatterns("test_input")
 
-	require.Equal(t, 0, findMirrorRow(patterns[0]))
-	require.Equal(t, 3, findMirrorRow(patterns[1]))
+	require.Equal(t, 0, findMirrorRow(patterns[0], -1))
+	require.Equal(t, 3+1, findMirrorRow(patterns[1], -1))
 }
 
 func TestSolve1(t *testing.T) {
@@ -56,8 +56,8 @@ func TestSolve1(t *testing.T) {
 	require.Equal(t, 405, solve1(patterns))
 }
 
-// func TestSolve2(t *testing.T) {
-// 	lines := readLines("test_input")
+func TestSolve2(t *testing.T) {
+	patterns := readPatterns("test_input")
 
-// 	require.Equal(t, 2286, solve2(lines))
-// }
+	require.Equal(t, 400, solve2(patterns))
+}
