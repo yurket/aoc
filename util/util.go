@@ -4,6 +4,8 @@ import (
 	"os"
 	"strconv"
 	"strings"
+
+	"golang.org/x/exp/constraints"
 )
 
 func ParseSlice(s string, sep string) []int {
@@ -91,16 +93,8 @@ func GetSingleKey[K comparable, V any](m map[K]V) K {
 	panic("Unexpected!")
 }
 
-func SumIntsOrFloats[K comparable, V int64 | float64](m map[K]V) V {
-	var s V
-	for _, v := range m {
-		s += v
-	}
-	return s
-}
-
-func Sum(xs []int) int {
-	sum := 0
+func Sum[V constraints.Integer | constraints.Float](xs []V) V {
+	var sum V
 	for _, x := range xs {
 		sum += x
 	}
