@@ -70,7 +70,7 @@ func findMirrorColumn(pattern Pattern, previousMirrorColumn int) int {
 	}
 	return 0
 }
-func traspose(pattern Pattern) Pattern {
+func transpose(pattern Pattern) Pattern {
 	p := Pattern{}
 
 	lineLength := len(pattern[0])
@@ -85,7 +85,7 @@ func traspose(pattern Pattern) Pattern {
 }
 
 func findMirrorRow(pattern Pattern, previousMirrorRow int) int {
-	transposed := traspose(pattern)
+	transposed := transpose(pattern)
 	return findMirrorColumn(transposed, previousMirrorRow)
 }
 

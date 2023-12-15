@@ -40,7 +40,7 @@ func TestTranspose(t *testing.T) {
 	p := Pattern{"###", "..."}
 	transposed := Pattern{"#.", "#.", "#."}
 
-	require.Equal(t, transposed, traspose(p))
+	require.Equal(t, transposed, transpose(p))
 }
 
 func TestFindMirrorRow(t *testing.T) {
