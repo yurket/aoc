@@ -39,6 +39,25 @@ func ReadLines(filename string) []string {
 	return lines
 }
 
+func ReadMap(filename string) [][]rune {
+	content, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	lines := strings.Split(string(content), "\n")
+	if lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+
+	map2d := [][]rune{}
+	for _, line := range lines {
+		chars := []rune(line)
+		map2d = append(map2d, chars)
+	}
+	return map2d
+}
+
 // TODO: replace with generic?
 func NewIntSet(slice []int) map[int]bool {
 	set := map[int]bool{}
