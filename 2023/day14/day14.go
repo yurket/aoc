@@ -44,7 +44,7 @@ func moveRocksNorth(m Map) {
 	}
 }
 
-func solve1(m Map) int {
+func countLoad(m Map) int {
 	// print(m)
 	moveRocksNorth(m)
 
@@ -60,12 +60,45 @@ func solve1(m Map) int {
 	return sum
 }
 
+func turnClockwise(m Map) Map {
+	if len(m) == 0 || len(m[0]) == 0 {
+		return nil
+	}
+
+	rows, cols := len(m), len(m[0])
+	turned := make(Map, cols)
+
+	for j := 0; j < cols; j++ {
+		turned[j] = make([]rune, rows)
+		for i := 0; i < rows; i++ {
+			turned[j][rows-i-1] = m[i][j]
+		}
+	}
+	return turned
+}
+
+func cycleMoves(m Map, cycles int) Map {
+	print(m)
+	for cycle := 0; cycle < cycles; cycle++ {
+		if cycle%1000000 == 0 {
+			fmt.Printf("cylce %d\n", cycle)
+		}
+		for i := 0; i < 4; i++ {
+			moveRocksNorth(m)
+			m = turnClockwise(m)
+		}
+	}
+	print(m)
+	return m
+}
+
 func solve2(m Map) int {
-	return 0
+	m = cycleMoves(m, 1000000000)
+	return countLoad(m)
 }
 
 func main() {
 	map2d := util.ReadMap("input")
-	fmt.Println("Solution 1 is ", solve1(map2d))
+	fmt.Println("Solution 1 is ", countLoad(map2d))
 	fmt.Println("Solution 2 is ", solve2(map2d))
 }
