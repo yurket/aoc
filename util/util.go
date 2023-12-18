@@ -58,6 +58,39 @@ func ReadMap(filename string) [][]rune {
 	return map2d
 }
 
+func copyMap(original [][]rune) [][]rune {
+	if original == nil {
+		return nil
+	}
+
+	copied := make([][]rune, len(original))
+	for i, row := range original {
+		copiedRow := make([]rune, len(row))
+		copy(copiedRow, row)
+		copied[i] = copiedRow
+	}
+	return copied
+}
+
+func mapsEqual(a, b [][]rune) bool {
+	if len(a) != len(b) {
+		return false
+	}
+
+	for i := range a {
+		if len(a[i]) != len(b[i]) {
+			return false
+		}
+		for j := range a[i] {
+			if a[i][j] != b[i][j] {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
 // TODO: replace with generic?
 func NewIntSet(slice []int) map[int]bool {
 	set := map[int]bool{}
