@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -56,6 +57,16 @@ func ReadMap(filename string) [][]rune {
 		map2d = append(map2d, chars)
 	}
 	return map2d
+}
+
+func print(m [][]rune) {
+	for _, line := range m {
+		for _, ch := range line {
+			fmt.Print(ch)
+		}
+		fmt.Println()
+	}
+	fmt.Println()
 }
 
 func copyMap(original [][]rune) [][]rune {
