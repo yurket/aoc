@@ -10,7 +10,7 @@ import (
 func TestSolve1(t *testing.T) {
 	map2d := util.ReadMap("test_input")
 
-	require.Equal(t, 8, solve1(map2d))
+	require.Equal(t, 46, solve1(map2d))
 }
 
 func TestSolve2(t *testing.T) {
@@ -18,3 +18,14 @@ func TestSolve2(t *testing.T) {
 
 	require.Equal(t, 0, solve1(map2d))
 }
+
+// ######....
+// .#...#....
+// .#...#####
+// .#...##...
+// .#...##...
+// .#...##...
+// .#..####..
+// ########..
+// .#######..
+// .#...#.#..

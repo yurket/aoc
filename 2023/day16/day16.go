@@ -7,6 +7,26 @@ import (
 )
 
 type Map [][]rune
+type Visited map[Point]bool
+
+func printMapState(m [][]rune, row, col int, visited Visited) {
+	for i, line := range m {
+		for j, ch := range line {
+			if i == row && j == col {
+				fmt.Print("*")
+				continue
+			}
+			if visited[Point{i, j}] {
+				fmt.Print("#")
+				continue
+			}
+			fmt.Print(string(ch))
+		}
+		fmt.Println()
+	}
+	fmt.Println()
+}
+
 type Point struct {
 	row, col int
 }
@@ -53,26 +73,88 @@ func flip(d Direction) Direction {
 	}
 }
 
-func traceBeam(m Map, start Point, direction Direction) {
+func isInsideMap(m Map, p Point) bool {
+	return p.row >= 0 && p.row < len(m) && p.col >= 0 && p.col < len(m[0])
+}
+
+func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
 	nextPoint := start.Add(move(direction))
-	cameFrom := flip(direction)
-	switch m[nextPoint.row][nextPoint.col] {
-	case '|':
-		if cameFrom == Left || cameFrom == Right {
-			traceBeam(m, nextPoint, Up)
-			traceBeam(m, nextPoint, Down)
-		} else {
-			///
+	if !isInsideMap(m, nextPoint) || (*visited)[nextPoint] {
+		return
+	}
+
+	(*visited)[nextPoint] = true
+	for isInsideMap(m, nextPoint) {
+		printMapState(m, nextPoint.row, nextPoint.col, *visited)
+
+		cameFrom := flip(direction)
+		switch m[nextPoint.row][nextPoint.col] {
+		case '|':
+			if cameFrom == Left || cameFrom == Right {
+				traceBeam(m, nextPoint, Up, visited)
+				traceBeam(m, nextPoint, Down, visited)
+				fmt.Printf("Beam divided in 2 and ended\n")
+				return
+			} else if cameFrom == Up {
+				direction = Down
+			} else {
+				direction = Up
+			}
+
+		case '-':
+			if cameFrom == Up || cameFrom == Down {
+				traceBeam(m, nextPoint, Right, visited)
+				traceBeam(m, nextPoint, Left, visited)
+				fmt.Printf("Beam divided in 2 and ended\n")
+				return
+			} else if cameFrom == Right {
+				direction = Left
+			} else {
+				direction = Right
+			}
+
+		case '\\':
+			switch cameFrom {
+			case Up:
+				direction = Right
+			case Right:
+				direction = Up
+			case Down:
+				direction = Left
+			case Left:
+				direction = Down
+			}
+
+		case '/':
+			switch cameFrom {
+			case Up:
+				direction = Left
+			case Right:
+				direction = Down
+			case Down:
+				direction = Right
+			case Left:
+				direction = Up
+			}
+
+		case '.':
+
+		default:
+			panic("Unknown point type!")
 		}
 
+		nextPoint = nextPoint.Add(move(direction))
+		(*visited)[nextPoint] = true
 	}
+
 }
 
 func solve1(m Map) int {
 	print(m)
-	traceBeam(m, Point{0, 0}, Right)
+	visited := Visited{Point{0, 0}: true}
+	traceBeam(m, Point{0, 0}, Right, &visited)
 	print(m)
-	return 0
+	return len(visited)
 }
 
 func solve2(m Map) int {
