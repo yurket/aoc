@@ -8,11 +8,21 @@ import (
 
 type Map [][]rune
 type Visited map[Point]bool
+type Bifurcations map[Point]bool
 
-func printMapState(m [][]rune, row, col int, visited Visited) {
+func printMapState(m [][]rune, p Point, visited Visited) {
 	for i, line := range m {
 		for j, ch := range line {
-			if i == row && j == col {
+			if i == p.row && j == p.col {
+				fmt.Print("*")
+				continue
+			}
+			fmt.Print(string(ch))
+		}
+
+		fmt.Printf("   ")
+		for j, ch := range line {
+			if i == p.row && j == p.col {
 				fmt.Print("*")
 				continue
 			}
@@ -22,6 +32,7 @@ func printMapState(m [][]rune, row, col int, visited Visited) {
 			}
 			fmt.Print(string(ch))
 		}
+
 		fmt.Println()
 	}
 	fmt.Println()
@@ -77,23 +88,25 @@ func isInsideMap(m Map, p Point) bool {
 	return p.row >= 0 && p.row < len(m) && p.col >= 0 && p.col < len(m[0])
 }
 
-func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
-	nextPoint := start.Add(move(direction))
-	if !isInsideMap(m, nextPoint) || (*visited)[nextPoint] {
-		return
-	}
+var bifurcations Bifurcations = Bifurcations{}
 
-	(*visited)[nextPoint] = true
+func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
+	nextPoint := start
 	for isInsideMap(m, nextPoint) {
-		printMapState(m, nextPoint.row, nextPoint.col, *visited)
+		(*visited)[nextPoint] = true
+		printMapState(m, nextPoint, *visited)
 
 		cameFrom := flip(direction)
 		switch m[nextPoint.row][nextPoint.col] {
 		case '|':
 			if cameFrom == Left || cameFrom == Right {
+				if _, exists := bifurcations[nextPoint]; exists {
+					return
+				}
+				bifurcations[nextPoint] = true
+
 				traceBeam(m, nextPoint, Up, visited)
 				traceBeam(m, nextPoint, Down, visited)
-				fmt.Printf("Beam divided in 2 and ended\n")
 				return
 			} else if cameFrom == Up {
 				direction = Down
@@ -103,9 +116,13 @@ func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
 
 		case '-':
 			if cameFrom == Up || cameFrom == Down {
+				if _, exists := bifurcations[nextPoint]; exists {
+					return
+				}
+				bifurcations[nextPoint] = true
+
 				traceBeam(m, nextPoint, Right, visited)
 				traceBeam(m, nextPoint, Left, visited)
-				fmt.Printf("Beam divided in 2 and ended\n")
 				return
 			} else if cameFrom == Right {
 				direction = Left
@@ -144,16 +161,18 @@ func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
 		}
 
 		nextPoint = nextPoint.Add(move(direction))
+	}
+	if isInsideMap(m, nextPoint) {
 		(*visited)[nextPoint] = true
 	}
 
 }
 
 func solve1(m Map) int {
-	print(m)
-	visited := Visited{Point{0, 0}: true}
-	traceBeam(m, Point{0, 0}, Right, &visited)
-	print(m)
+	start := Point{0, 0}
+	visited := Visited{start: true}
+	traceBeam(m, start, Right, &visited)
+	printMapState(m, start, visited)
 	return len(visited)
 }
 

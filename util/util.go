@@ -59,17 +59,17 @@ func ReadMap(filename string) [][]rune {
 	return map2d
 }
 
-func print(m [][]rune) {
+func PrintMap(m [][]rune) {
 	for _, line := range m {
 		for _, ch := range line {
-			fmt.Print(ch)
+			fmt.Print(string(ch))
 		}
 		fmt.Println()
 	}
 	fmt.Println()
 }
 
-func copyMap(original [][]rune) [][]rune {
+func CopyMap(original [][]rune) [][]rune {
 	if original == nil {
 		return nil
 	}
@@ -83,7 +83,7 @@ func copyMap(original [][]rune) [][]rune {
 	return copied
 }
 
-func mapsEqual(a, b [][]rune) bool {
+func MapsEqual(a, b [][]rune) bool {
 	if len(a) != len(b) {
 		return false
 	}
