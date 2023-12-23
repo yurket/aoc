@@ -88,25 +88,25 @@ func isInsideMap(m Map, p Point) bool {
 	return p.row >= 0 && p.row < len(m) && p.col >= 0 && p.col < len(m[0])
 }
 
-var bifurcations Bifurcations = Bifurcations{}
-
-func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
+func traceBeam(m Map, start Point, direction Direction, visited *Visited, bifurcations *Bifurcations) {
 	nextPoint := start
 	for isInsideMap(m, nextPoint) {
 		(*visited)[nextPoint] = true
-		printMapState(m, nextPoint, *visited)
+		// printMapState(m, nextPoint, *visited)
 
 		cameFrom := flip(direction)
 		switch m[nextPoint.row][nextPoint.col] {
 		case '|':
 			if cameFrom == Left || cameFrom == Right {
-				if _, exists := bifurcations[nextPoint]; exists {
+				if _, exists := (*bifurcations)[nextPoint]; exists {
 					return
 				}
-				bifurcations[nextPoint] = true
+				// break cycling by preventing new beam splits in the point of
+				// previous splits
+				(*bifurcations)[nextPoint] = true
 
-				traceBeam(m, nextPoint, Up, visited)
-				traceBeam(m, nextPoint, Down, visited)
+				traceBeam(m, nextPoint, Up, visited, bifurcations)
+				traceBeam(m, nextPoint, Down, visited, bifurcations)
 				return
 			} else if cameFrom == Up {
 				direction = Down
@@ -116,13 +116,13 @@ func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
 
 		case '-':
 			if cameFrom == Up || cameFrom == Down {
-				if _, exists := bifurcations[nextPoint]; exists {
+				if _, exists := (*bifurcations)[nextPoint]; exists {
 					return
 				}
-				bifurcations[nextPoint] = true
+				(*bifurcations)[nextPoint] = true
 
-				traceBeam(m, nextPoint, Right, visited)
-				traceBeam(m, nextPoint, Left, visited)
+				traceBeam(m, nextPoint, Right, visited, bifurcations)
+				traceBeam(m, nextPoint, Left, visited, bifurcations)
 				return
 			} else if cameFrom == Right {
 				direction = Left
@@ -171,13 +171,42 @@ func traceBeam(m Map, start Point, direction Direction, visited *Visited) {
 func solve1(m Map) int {
 	start := Point{0, 0}
 	visited := Visited{start: true}
-	traceBeam(m, start, Right, &visited)
-	printMapState(m, start, visited)
+	bifurcations := Bifurcations{}
+	traceBeam(m, start, Right, &visited, &bifurcations)
+	// printMapState(m, start, visited)
 	return len(visited)
 }
 
+type StartingPoint struct {
+	p Point
+	d Direction
+}
+
 func solve2(m Map) int {
-	return 0
+	startingPoints := []StartingPoint{}
+	for row := 0; row < len(m); row++ {
+		// Right
+		startingPoints = append(startingPoints, StartingPoint{Point{row, 0}, Right})
+		// Left
+		startingPoints = append(startingPoints, StartingPoint{Point{row, len(m[0]) - 1}, Left})
+	}
+	for col := 0; col < len(m[0]); col++ {
+		// Top
+		startingPoints = append(startingPoints, StartingPoint{Point{0, col}, Down})
+		// Bottom
+		startingPoints = append(startingPoints, StartingPoint{Point{len(m) - 1, col}, Up})
+	}
+
+	maxEnergized := 0
+	for _, startingPoint := range startingPoints {
+		visited := Visited{startingPoint.p: true}
+		bifurcations := Bifurcations{}
+		traceBeam(m, startingPoint.p, startingPoint.d, &visited, &bifurcations)
+		if len(visited) > maxEnergized {
+			maxEnergized = len(visited)
+		}
+	}
+	return maxEnergized
 }
 
 func main() {
