@@ -11,13 +11,9 @@ fn read_lines(filename: &str) -> Vec<String> {
 }
 
 fn part1(left: &Vec<i32>, right: &Vec<i32>) -> i32 {
-
-    let mut distances = 0;
-    for (l, r) in left.iter().zip(right.iter()) {
-        distances += (l-r).abs();
-    }
-
-    distances
+    std::iter::zip(left, right)
+        .map(|(l,r)| (l-r).abs())
+        .sum()
 }
 
 fn part2(left: &Vec<i32>, right: &Vec<i32>) -> i32 {
