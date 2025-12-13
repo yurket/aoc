@@ -55,19 +55,40 @@ fn part1(lines: &[Vec<char>]) -> i32 {
     count
 }
 
-// fn part2(lines: &[Vec<i32>]) -> i128 {
-//     sum
-// }
+fn part2(lines: &mut [Vec<char>]) -> i32 {
+    print_lines(&lines);
+
+    let mut count = 0;
+    loop {
+        let mut new_portion = 0;
+        for i in 0..lines.len() {
+            for j in 0..lines[0].len() {
+                if lines[i][j] != '@' {
+                    continue;
+                }
+                if get_nearby_rolls_num(lines, i as isize, j as isize) < 4 {
+                    new_portion += 1;
+                    lines[i][j] = 'x';
+                }
+            }
+        }
+        if new_portion == 0 {
+            break;
+        }
+        count += new_portion;
+    }
+    count
+}
 
 fn main() {
-    let lines = read_file("input");
+    let mut lines = read_file("input");
     // println!("input lines: {:?}", lines);
 
     let sol1 = part1(&lines);
     println!("Part 1 solution: {sol1}");
 
-    // let sol2 = part2(&lines);
-    // println!("Part 2 solution: {sol2}");
+    let sol2 = part2(&mut lines);
+    println!("Part 2 solution: {sol2}");
 }
 
 #[cfg(test)]
@@ -80,9 +101,9 @@ mod tests {
         assert_eq!(part1(&lines), 13);
     }
 
-    // #[test]
-    // fn test_part2() {
-    //     let lines = read_file("test_input");
-    //     assert_eq!(part2(&lines), 3121910778619);
-    // }
+    #[test]
+    fn test_part2() {
+        let mut lines = read_file("test_input");
+        assert_eq!(part2(&mut lines), 43);
+    }
 }
