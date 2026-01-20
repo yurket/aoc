@@ -40,24 +40,39 @@ fn merge_ranges(orig_ranges: &[Range]) -> Vec<Range> {
     }
 
     ranges.sort();
-    let mut i = 0;
-    let mut len = ranges.len();
-    loop {
-        if i + 1 > len - 1 {
-            break;
-        }
-        let current = &ranges[i];
-        let next = &ranges[i + 1];
-        if next.0 >= current.0 && next.0 <= current.1 {
-            ranges[i].1 = max(current.1, next.1);
-            ranges.remove(i + 1);
-            len -= 1;
-            continue;
-        }
-        i += 1;
-    }
-
     ranges
+        .into_iter()
+        .fold(Vec::new(), |mut acc, (start, end)| {
+            if let Some(last) = acc.last_mut() {
+                if start >= last.0 && start <= last.1 {
+                    last.1 = max(last.1, end);
+                } else {
+                    acc.push((start, end));
+                }
+            } else {
+                acc.push((start, end));
+            }
+            acc
+        })
+
+    // let mut i = 0;
+    // let mut len = ranges.len();
+    // loop {
+    //     if i + 1 > len - 1 {
+    //         break;
+    //     }
+    //     let current = &ranges[i];
+    //     let next = &ranges[i + 1];
+    //     if next.0 >= current.0 && next.0 <= current.1 {
+    //         ranges[i].1 = max(current.1, next.1);
+    //         ranges.remove(i + 1);
+    //         len -= 1;
+    //         continue;
+    //     }
+    //     i += 1;
+    // }
+
+    // ranges
 }
 
 fn part2(ranges: &[Range]) -> u128 {
