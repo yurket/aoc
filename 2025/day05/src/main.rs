@@ -1,8 +1,9 @@
 use std::fs;
 
 type Range = (u128, u128);
+type Id = u128;
 
-fn read_file(filename: &str) -> (Vec<Range>, Vec<u128>) {
+fn read_file(filename: &str) -> (Vec<Range>, Vec<Id>) {
     let contents = fs::read_to_string(filename).expect("Should have been able to read the file");
     let (ranges_str, ids_str) = contents.split_once("\n\n").unwrap();
 
@@ -20,7 +21,20 @@ fn read_file(filename: &str) -> (Vec<Range>, Vec<u128>) {
 }
 
 fn part1(ranges: &[Range], ids: &[u128]) -> i32 {
-    0
+    let mut fresh_count = 0;
+    for id in ids {
+        for (start, end) in ranges {
+            if start <= id && id <= end {
+                fresh_count += 1;
+                break;
+            }
+        }
+    }
+    fresh_count
+}
+
+fn merge_ranges(ranges: &mut [Range]) -> &mut [Range] {
+    ranges
 }
 
 // fn part2(lines: &mut [Vec<char>]) -> i32 {
